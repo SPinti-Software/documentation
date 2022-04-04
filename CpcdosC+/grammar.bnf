@@ -1,0 +1,97 @@
+<lowercase> ::= [a-z]
+<uppercase> ::= [A-Z]
+<digit> ::= [0-9]
+
+<unsigned_nbr> ::= <digit>+
+                 | <digit>+ "." <digit>+
+
+<number> ::= "-" <unsigned_nbr>
+            | "+" <unsigned_nbr>
+
+<space> ::= (" "+)?
+<break> ::= "\n"
+
+<alpha> ::= <lowercase> | <uppercase>
+<alphadigit> ::= <alpha> | <digit>
+
+<keyword> ::= <alpha>+ "/"
+
+<varname> ::= <alpha> (<alphadigit> | "_")+
+<variable> ::= "%" <varname> "%"
+<escape_sequence> ::= "\\%"
+
+<parent_args> ::= "(" (<data> ",")+ <data> ")"
+                | "(" <data> ")"
+                | "()"
+
+
+<fn_call> ::= "/F:" <varname> <parent_args>
+            | <varname> "." <varname> <parent_args>
+
+<math_op> ::= "*"
+            | "/"
+            | "+"
+            | "-"
+            | "("
+            | ")"
+
+<math_calc> ::= <number> <math_op> <number>
+<math_expr> ::= "/C(" <math_calc>+ ")"
+
+<data> ::= <alphadigit>+
+         | "_" 
+         | "-" 
+         | "!" 
+         | "\'"
+         | <escape_sequence> "%"
+         | <escape_sequence> <variable>
+         | <fn_call>
+         | <digit> <digit>? <digit>? "." <digit> <digit>? <digit>? "." <digit> <digit>? <digit>? "." <digit> <digit>? <digit>? 
+        
+<parameters> ::= "\\" "#" <alpha>+ 
+               | "/" <alpha>+
+               | "/" <alpha>+ "=" <data>
+               | <alpha>+ ":" <data>+
+               | "<alpha>+ <space> "=" <space> "\"" <data>+ "\""
+
+<exe> ::= "exe/" <space> ("&" | "&+")? <varname> ".cpc"
+<help> ::= "help/" <space> <keyword>
+<label> ::= ":" <varname> ":"
+            
+<basic_stmt> ::= <keyword> <space> (<parameters> <space>)? <math_expr>? ((<data> <space> )+)?
+<output_getter> ::= "@#" <varname> <basic_stmt>
+
+<comment> ::= "rem/" <space>
+            | "//" <space>
+            | "\'" <space>
+
+<cond_op> ::= "=" | "=="
+            | "!=" | "N="
+            | ">"
+            | "!>" | "N>"
+            | "<"
+            | "!<" | "N<"
+            | ">="
+            | "!>=" | "N>="
+            | "!<=" | "N<="
+            | "~="
+            | "!~=" | N~="
+
+<if_stmt> ::= "if/" <space> <data> <cond_op> <data> <space> "then:" <break>? <stmt>?
+<else_stmt> ::= "else:" <break>? <stmt>
+<cond> ::= <if_stmt> <break>? <else_stmt>? <break>? "end/ if"
+
+
+<stmt> ::= <basic_stmt>
+        | <declaration>
+        | <keyword>
+        | <fn_call>
+        | <exe>
+        | <output_getter>
+        | <comment>
+        | <if_stmt>
+        | <math_expr>
+
+<object> ::= <alpha>+ "/" <break> <parameters>+ <break> ("create/" | "@#" <varname> <space> "create/") <break> "end/ " <alpha>+ 
+<declaration> ::= "set/" <space> <varname> <space>? "=" <space>? (<stmt> | <data>)
+<func_declaration> ::= "function/" <space> <varname> <parent_args> <break> <stmt> <break> "return/" <stmt> <break> "end/ function"
