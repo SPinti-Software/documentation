@@ -7,6 +7,7 @@
 
 <number> ::= "-" <unsigned_nbr>
             | "+" <unsigned_nbr>
+            | <unsigned_nbr>
 
 <space> ::= (" "+)?
 <break> ::= "\n"
@@ -91,6 +92,8 @@
         | <comment>
         | <if_stmt>
         | <math_expr>
+        | <object>
+        | <func_declaration>
 
 <object> ::= <alpha>+ "/" <break> <parameters>+ <break> ("create/" | "@#" <varname> <space> "create/") <break> "end/ " <alpha>+ 
 <declaration> ::= "set/" <space> <varname> <space>? "=" <space>? (<stmt> | <data>)
